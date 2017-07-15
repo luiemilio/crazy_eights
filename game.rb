@@ -96,11 +96,3 @@ class Game
 
 
 end
-# player = Player.new(gets.chomp, deck)
-game = Game.new
-
-game.play
-
-# game.players.each do |player|
-#   p player.show_hand
-# end
