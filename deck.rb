@@ -1,14 +1,16 @@
 require_relative 'card'
-require 'byebug'
 
+# Represents a deck of playing cards.
 class Deck
+
   attr_accessor :cards
 
+  # Returns an array of all 52 playing cards.
   def self.all_cards
     all_cards = []
     Card.suits.each do |suit|
-      Card.ranks.each do |rank|
-        all_cards << Card.new(suit, rank)
+      Card.values.each do |value|
+        all_cards << Card.new(suit, value)
       end
     end
     all_cards
@@ -16,20 +18,27 @@ class Deck
 
   def initialize(cards = Deck.all_cards)
     @cards = cards
+    self.shuffle
   end
 
-  def shuffle!
-    self.cards = self.cards.shuffle
+  # Returns the number of cards in the deck.
+  def count
+    self.cards.length
   end
 
+  # Takes `n` cards from the top of the deck.
   def take(n)
-    taken = []
-    n.times do
-      taken << self.cards.shift
-    end
-    taken
+    raise "not enough cards" if n > self.count
+    self.cards.shift(n)
   end
+
+  # Returns an array of cards to the bottom of the deck.
+  def return(cards)
+    self.cards += cards
+  end
+
+  def shuffle
+    self.cards.shuffle!
+  end
+
 end
-
-
-deck = Deck.new
