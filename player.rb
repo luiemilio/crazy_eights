@@ -21,13 +21,3 @@ class Player
 
 
 end
-
-# 
-# d1 = Deck.new
-# p1 = Player.new("Luis", d1)
-# p2 = Player.new("Carmen", d1)
-# p3 = Player.new("Winston", d1)
-#
-# p1.show_hand
-# # p2.show_hand
-# # p3.show_hand

@@ -26,11 +26,3 @@ class Hand
   end
 
 end
-
-
-# d1 = Deck.new
-# h1 = Hand.deal_from(d1)
-# h2 = Hand.deal_from(d1)
-#
-# p h1.cards.map{|card| card.to_s}
-# p h2.cards.map{|card| card.to_s}

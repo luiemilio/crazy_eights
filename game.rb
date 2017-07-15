@@ -1,5 +1,6 @@
 require_relative 'player'
 require_relative 'deck'
+require 'byebug'
 
 class Game
 
@@ -14,41 +15,46 @@ class Game
     players
   end
 
-  attr_accessor :deck, :players, :discard_pile
+  attr_accessor :deck, :players, :discard_pile, :wild_card_suit
 
   def initialize(deck = Deck.new)
+    system "clear"
     @deck = deck
     @players = Game.create_players(deck)
     @discard_pile = deck.take(1)
-    # @current_player = players.first
+    @wild_card_suit = discard_pile.last.suit
   end
 
   def take_turn(player)
-    if self.valid_hand?
-      puts player.show_hand
-      current_card = self.get_card(player)
+    until self.valid_hand?(player)
+      puts "You need to draw a new card"
+      player.hand.draw(deck)
     end
 
-
-
-    end
-
+    player.show_hand
+    current_card = self.get_card(player)
+    self.handle_card(player, current_card)
   end
 
   def current_card_in_pile
-    puts self.discard_pile.last
+    self.discard_pile.last
   end
 
-  def won?
-    self.players.any? {|player| player.hand_count == 0}
+  def won?(player)
+    player.hand.count == 0
   end
 
   def play
-    self.current_card_in_pile
-
+    system "clear"
     until deck.count == 0
       players.each do |player|
+        p "CURRENT PLAYER: #{player.name}"
+        p "Current discard pile: #{self.current_card_in_pile}"
         self.take_turn(player)
+        if won?(player)
+          puts "#{player.name} wins!"
+          break
+        end
         system "clear"
       end
     end
@@ -62,11 +68,30 @@ class Game
   end
 
   def valid_hand?(player)
-    suits_in_hand = player.hand.cards.map do {|card| card.suit}
-    values_in_hand = player.hand.cards.map do {|card| card.values}
-
+    suits_in_hand = player.hand.cards.map {|card| card.suit}
+    values_in_hand = player.hand.cards.map {|card| card.value}
+    # debugger
     suits_in_hand.include?(current_card_in_pile.suit) ||
-    values_in_hand.include?(current_card_in_pile.value)
+    (values_in_hand.include?(current_card_in_pile.value) ||
+    values_in_hand.include?(8) || values_in_hand.include?(self.wild_card_suit))
+  end
+
+  def handle_card(player, card)
+
+    if card.value == :eight
+      puts "Set wild card suit"
+      puts "Options: ##{Card.suits}"
+      wild_card = gets.chomp.to_sym
+      self.wild_card_suit = wild_card
+      self.discard_pile << card
+      player.hand.cards.delete(card)
+    elsif card.value == current_card_in_pile.value ||
+          card.suit == current_card_in_pile.suit
+      self.wild_card_suit = ''
+      self.discard_pile << card
+      player.hand.cards.delete(card)
+    end
+
   end
 
 
@@ -74,8 +99,7 @@ end
 # player = Player.new(gets.chomp, deck)
 game = Game.new
 
-p game.players.first.show_hand
-p game.get_card(game.players.first)
+game.play
 
 # game.players.each do |player|
 #   p player.show_hand
